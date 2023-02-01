@@ -1,0 +1,3 @@
+[submodule "flipper-game-engine"]
+	path = flipper-game-engine
+	url = https://github.com/teeebor/flipper-game-engine.git
