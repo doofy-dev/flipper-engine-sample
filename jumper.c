@@ -35,9 +35,10 @@ void setup_play_scene() {
     entity_t *e = new_entity("Ball");
     e->transform.position = (Vector) {20, 20};
     e->sprite = load_sprite(&I_small_ball);
-    e->sprite.anchor = (Vector) {0.5, 0.05};
+    e->sprite.anchor = (Vector) {0.5, 0.5};
     e->draw = true;
-    PhysicsBody *body = new_physics_body((Vector) {0, 0.0005f},0.1, Material_RUBBER, false);
+    PhysicsBody *body = new_physics_body((Vector) {0, 0.00098},0.01, Material_RUBBER, false);
+//    PhysicsBody *body = new_physics_body((Vector) {0, 0.0005f},0.1, Material_RUBBER, false);
     set_to_circle_collider(body, 4);
     add_physics_body(e, body);
 
@@ -46,12 +47,13 @@ void setup_play_scene() {
     e2->sprite = load_sprite(&I_small_ball);
     e2->sprite.anchor = (Vector) {0.5, 0.5};
     e2->draw = true;
-    body = new_physics_body((Vector) {0, 0.09f},1, Material_RUBBER, true);
+    body = new_physics_body((Vector) {0, 0},1, Material_RUBBER, true);
     set_to_circle_collider(body, 4);
     add_physics_body(e2, body);
 
     entity_t *e3 = new_entity("Platform");
     e3->transform.position = (Vector) {0, 50};
+    e3->transform.rotation=M_PI_2/4;
     e3->sprite = load_sprite(&I_platforms);
 //    e3->transform.rotation=0.7853982;
     body = new_physics_body((Vector) {0, 0},1, Material_CONCRETE, true);
@@ -62,13 +64,13 @@ void setup_play_scene() {
             {0,   7},
     }, 4);
     add_physics_body(e3, body);
+    e3->sprite.anchor = (Vector) {0, 0};
 
 //    e3->sprite = load_sprite(&I_big_ball);
 //    FURI_LOG_I("AS", "SIZE: %i, %i", icon_get_width(&I_ball), icon_get_height(&I_ball));
-    e3->sprite.anchor = (Vector) {0, 0};
     e3->draw = true;
 
-//    add_component(e, init_ball, rotate, sizeof(ball_data));
+//    add_component(e3, init_ball, rotate, sizeof(ball_data));
 //    add_component(e3, init_ball, scale, sizeof(ball_data));
 //    add_component(e3, init_ball, rotate, sizeof(ball_data));
 
