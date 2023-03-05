@@ -3,6 +3,7 @@
 #include "defines.h"
 #include "jumper_icons.h"
 #include "flipper-game-engine/util/util.h"
+#include "flipper-game-engine/physics/physics.h"
 
 
 typedef struct {
@@ -22,48 +23,62 @@ void rotate(ComponentInfo *component, void *state) {
 
 void scale(ComponentInfo *component, void *state) {
     UNUSED(state);
-    add_scale(&(component->entity->transform), (Vector) {0.01, 0.01});
-    if (component->entity->transform.scale.x > 4)
-        set_scale(&(component->entity->transform), (Vector) {0.1, 0.1});
+    add_scale(&(component->entity->transform), 0.1);
+    if (component->entity->transform.scale > 4)
+        set_scale(&(component->entity->transform), 0.1);
 }
 
 void setup_play_scene() {
-    //Create new scene
     Scene *s = new_scene("Play");
-    //Create new entity and set up data for it
+
+
     entity_t *e = new_entity("Ball");
-    e->transform.position = (Vector) {20, -10};
-    //Store image that will be drawn on render
+    e->transform.position = (Vector) {20, 20};
     e->sprite = load_sprite(&I_small_ball);
-    //Size of the image
-    e->sprite.anchor = (Vector) {0.5, 0.5};
-    //Enable drawing
+    e->sprite.anchor = (Vector) {0.5, 0.05};
     e->draw = true;
+    PhysicsBody *body = new_physics_body((Vector) {0, 0.0005f},0.1, Material_RUBBER, false);
+    set_to_circle_collider(body, 4);
+    add_physics_body(e, body);
 
     entity_t *e2 = new_entity("Ball2");
-    e2->transform.position = (Vector) {-20, -10};
-    e2->sprite = load_sprite(&I_big_ball);
+    e2->transform.position = (Vector) {25, 40};
+    e2->sprite = load_sprite(&I_small_ball);
     e2->sprite.anchor = (Vector) {0.5, 0.5};
     e2->draw = true;
+    body = new_physics_body((Vector) {0, 0.09f},1, Material_RUBBER, true);
+    set_to_circle_collider(body, 4);
+    add_physics_body(e2, body);
 
-    entity_t *e3 = new_entity("Ball3");
-    e3->transform.position = (Vector) {64, 32};
-//    e3->transform.rotation=0.7853982;
+    entity_t *e3 = new_entity("Platform");
+    e3->transform.position = (Vector) {0, 50};
     e3->sprite = load_sprite(&I_platforms);
+//    e3->transform.rotation=0.7853982;
+    body = new_physics_body((Vector) {0, 0},1, Material_CONCRETE, true);
+    set_to_polygon_collider(body, (Vector[4]) {
+            {0,   0},
+            {128, 0},
+            {128, 7},
+            {0,   7},
+    }, 4);
+    add_physics_body(e3, body);
+
 //    e3->sprite = load_sprite(&I_big_ball);
 //    FURI_LOG_I("AS", "SIZE: %i, %i", icon_get_width(&I_ball), icon_get_height(&I_ball));
-    e3->sprite.anchor = (Vector) {0.5, 0.5};
+    e3->sprite.anchor = (Vector) {0, 0};
     e3->draw = true;
 
-    add_component(e, init_ball, rotate, sizeof(ball_data));
+//    add_component(e, init_ball, rotate, sizeof(ball_data));
 //    add_component(e3, init_ball, scale, sizeof(ball_data));
-    add_component(e3, init_ball, rotate, sizeof(ball_data));
+//    add_component(e3, init_ball, rotate, sizeof(ball_data));
 
     //Add to scene
 
 //    add_to_entity(e3, e);
 //    add_to_entity(e, e2);
     add_to_scene(s, e3);
+    add_to_scene(s, e);
+    add_to_scene(s, e2);
     set_scene(s);
 }
 
