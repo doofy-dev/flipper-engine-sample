@@ -1,6 +1,6 @@
 App(
     appid="jumper",
-    name="Jumper",
+    name="CPPJumper",
     apptype=FlipperAppType.EXTERNAL,
     entry_point="jumper_app",
     cdefines=["APP_SOLITAIRE"],
