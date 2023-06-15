@@ -4,27 +4,48 @@
 #include "jumper_icons.h"
 
 
-class RotationComponent : public Component {
+class RotationComponent : public Component<RotationComponent> {
     float speed=1;
 public:
     explicit RotationComponent(float s): speed(s){}
     RotationComponent(): speed(1){}
 
     void Update(const float &delta) override {
-/*
-
-        if(GetInput(InputKeyOk)==InputPress)
-            speed*=-1;
-*/
-
         entity->get_transform()->rotate(speed * (float)delta);
     }
-    void OnInput(InputKey key, InputState type) override {
+
+    void Swap(){
+        speed*=-1;
+    }
+   /* void OnInput(InputKey key, InputState type) override {
         if(key == InputKeyOk && type == InputPress)
             speed*=-1;
     }
-
+*/
 };
+
+class SwapRotationComponent : public Component<SwapRotationComponent>{
+    RotationComponent *component = nullptr;
+public:
+    void Start() override {
+        component = entity->GetComponent<RotationComponent>();
+    }
+
+    void OnInput(InputKey key, InputState type) override {
+        if(key == InputKeyOk && type == InputPress)
+            component->Swap();
+    }
+};
+
+
+class CheckHeapComponent : public Component<CheckHeapComponent>{
+public:
+    void OnInput(InputKey key, InputState type) override {
+        if(key == InputKeyUp && type == InputPress)
+            CHECK_HEAP();
+    }
+};
+
 
 #ifdef __cplusplus
 extern "C"
@@ -34,24 +55,27 @@ extern "C"
 int32_t jumper_app(void *p) {
     UNUSED(p);
     size_t heap = memmgr_get_free_heap();
-    Engine *engine_instance = new Engine("Jumper", 30, true);
+    auto *engine_instance = new Engine("Jumper", 30, true);
 
     auto *current_scene = new Scene("play");
 
     auto *ball = new Entity("Ball");
     ball->AddComponent<RotationComponent>();
+    ball->AddComponent<CheckHeapComponent>();
     ball->set_sprite(&I_platforms);
     ball->get_transform()->set_position({20,32});
     current_scene->Add(ball);
 
     ball = new Entity("Ball 2");
     ball->AddComponent<RotationComponent>(0.5f);
+    ball->AddComponent<SwapRotationComponent>();
     ball->set_sprite(&I_platforms);
-//    ball->AddComponent<PhysicsBody>((Vector){1,0}, 1, Material_CONCRETE, false);
+    ball->AddComponent<PhysicsBody>((Vector){1,0}, 1, Material_CONCRETE, false);
     ball->get_transform()->set_position({100,32});
     current_scene->Add(ball);
 
     engine_instance->SetScene(current_scene);
+
 
     engine_instance->Start();
     delete engine_instance;
