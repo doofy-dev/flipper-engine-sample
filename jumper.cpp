@@ -37,7 +37,7 @@ class SwapRotationComponent : public Component<SwapRotationComponent> {
     RotationComponent *component = nullptr;
 public:
     void Start() override {
-        component = entity->GetComponent<RotationComponent>();
+        component = entity->get_component<RotationComponent>();
     }
 
     void OnInput(InputKey key, InputState type) override {
@@ -66,29 +66,52 @@ int32_t jumper_app(void *p) {
     size_t heap = memmgr_get_free_heap();
     auto *engine_instance = new Engine("Jumper", 30, true);
 
+    Vector corners[4]= {
+            {-64,-3.5f},
+            {64,-3.5f},
+            {64,3.5f},
+            {-64,3.5f},
+    };
+
     auto *current_scene = new Scene("play");
 
-    auto *ball = new Entity("Ball");
-    ball->AddComponent<RotationComponent>();
-    ball->AddComponent<CheckHeapComponent>();
-    ball->set_sprite(&I_platforms);
-    ball->get_transform()->set_position({20, 32});
-    current_scene->Add(ball);
+    auto *entity = new Entity("Platform1");
+    entity->set_sprite(&I_platforms);
+    entity->get_transform()->set_position({64, 60});
+    entity->add_component<PhysicsBody>((Vector){0, 9.8}, 10, Material_RUBBER, true);
+    entity->add_component<PolyCollider>(corners, 4);
+//    entity->add_component<RotationComponent>();
+    current_scene->Add(entity);
 
-    ball = new Entity("Ball 2");
-    ball->AddComponent<RotationComponent>();
-    ball->AddComponent<ScaleComponent>();
-    ball->set_sprite(&I_big_ball);
-    ball->get_transform()->set_position({64, 16});
-    current_scene->Add(ball);
+    entity = new Entity("Ball");
+    entity->set_sprite(&I_big_ball);
+    entity->add_component<PhysicsBody>((Vector) {0,  9.8}, 0.1, Material_RUBBER, false);
+    entity->add_component<CircleCollider>(8);
+    entity->get_transform()->set_position({64, 16});
+//    entity->add_component<RotationComponent>();
+    current_scene->Add(entity);
+    entity->get_component<PhysicsBody>()->velocity = {0, 10};
+/*
 
-    ball = new Entity("Ball 3");
-    ball->AddComponent<RotationComponent>(0.5f);
-    ball->AddComponent<SwapRotationComponent>();
-    ball->set_sprite(&I_platforms);
-//    ball->AddComponent<PhysicsBody>((Vector){1,0}, 1, Material_CONCRETE, false);
-    ball->get_transform()->set_position({100, 32});
-    current_scene->Add(ball);
+    entity = new Entity("Platform2");
+    entity->set_sprite(&I_platforms);
+    entity->get_transform()->rotate_deg(-45);
+    entity->get_transform()->set_position({110, 32});
+    entity->add_component<PhysicsBody>((Vector){0, 9.8}, 10, Material_RUBBER, true);
+    entity->add_component<PolyCollider>(corners, 4);
+//    entity->add_component<RotationComponent>();
+    current_scene->Add(entity);
+
+    entity = new Entity("Platform3");
+    entity->set_sprite(&I_platforms);
+    entity->get_transform()->rotate_deg(45);
+    entity->add_component<PhysicsBody>((Vector){0, 9.8}, 10, Material_RUBBER, true);
+    entity->add_component<PolyCollider>(corners, 4);
+    entity->get_transform()->set_position({10, 32});
+//    entity->add_component<RotationComponent>();
+    current_scene->Add(entity);
+*/
+
 
     engine_instance->SetScene(current_scene);
 
